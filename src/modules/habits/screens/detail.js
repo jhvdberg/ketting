@@ -7,7 +7,7 @@ import { loadHabitData, deleteHabit } from "../storage.js";
 import { scheduleForDate, scheduleLabel, computeStreaks } from "../model.js";
 import { confirmDialog } from "../../../core/ui/confirm.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader } from "./_shared.js";
+import { screenHeader } from "./shared.js";
 
 export default async function renderHabitDetail(container, params) {
   const db = getDb();

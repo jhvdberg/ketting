@@ -5,7 +5,7 @@ import { todayISO, nowTimestamp } from "../../../core/dateUtils.js";
 import { loadHabitsWithData, setEntryDone } from "../storage.js";
 import { isScheduled, isDone, scheduleForDate, scheduleLabel, computeStreaks } from "../model.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader } from "./_shared.js";
+import { screenHeader } from "./shared.js";
 
 export default async function renderHabitsHome(container) {
   const db = getDb();

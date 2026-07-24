@@ -4,7 +4,7 @@ import { getDb } from "../../../core/context.js";
 import { todayISO, addDays, parseISODate } from "../../../core/dateUtils.js";
 import { loadHabitData } from "../storage.js";
 import { computeStreaks, calendarDayStatus } from "../model.js";
-import { screenHeader } from "./_shared.js";
+import { screenHeader } from "./shared.js";
 
 export default async function renderHabitStreaks(container, params) {
   const db = getDb();

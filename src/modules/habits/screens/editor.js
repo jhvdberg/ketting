@@ -7,7 +7,7 @@ import { generateId } from "../../../core/id.js";
 import { loadHabitData, saveHabit, replaceSchedulesForHabit } from "../storage.js";
 import { isValidDaysArray, scheduleForDate, upsertScheduleVersion, WEEKDAY_LABELS } from "../model.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader } from "./_shared.js";
+import { screenHeader } from "./shared.js";
 
 function sameDays(a, b) {
   const sa = [...a].sort((x, y) => x - y);

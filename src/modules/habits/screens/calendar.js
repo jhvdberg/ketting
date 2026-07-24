@@ -5,7 +5,7 @@ import { navigate } from "../../../core/router.js";
 import { todayISO, weekdayMon0 } from "../../../core/dateUtils.js";
 import { loadHabitData } from "../storage.js";
 import { calendarDayStatus } from "../model.js";
-import { screenHeader, MONTHS_LONG } from "./_shared.js";
+import { screenHeader, MONTHS_LONG } from "./shared.js";
 
 const WEEKDAY_SHORT = ["ma", "di", "wo", "do", "vr", "za", "zo"];
 

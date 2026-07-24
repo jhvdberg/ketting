@@ -4,7 +4,7 @@ import { getDb } from "../../../core/context.js";
 import { listHabits, deleteHabit } from "../storage.js";
 import { confirmDialog } from "../../../core/ui/confirm.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader } from "./_shared.js";
+import { screenHeader } from "./shared.js";
 
 export default async function renderHabitList(container) {
   const db = getDb();

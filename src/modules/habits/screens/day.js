@@ -6,7 +6,7 @@ import { todayISO, addDays, isValidISODate, parseISODate, nowTimestamp } from ".
 import { loadHabitsWithData, setEntryDone } from "../storage.js";
 import { isScheduled, isDone, scheduleForDate, scheduleLabel } from "../model.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader, WEEKDAY_LONG, MONTHS_LONG } from "./_shared.js";
+import { screenHeader, WEEKDAY_LONG, MONTHS_LONG } from "./shared.js";
 
 function formatDateLong(iso) {
   const d = parseISODate(iso);

@@ -4,7 +4,7 @@
  * handmatig gesynchroniseerd met src/core/version.js bij elke release die
  * bestanden toevoegt of wijzigt.
  */
-const CACHE_VERSION = "ketting-v2.0.0";
+const CACHE_VERSION = "ketting-v2.0.1";
 const ASSETS = [
   "./",
   "./index.html",
@@ -36,7 +36,7 @@ const ASSETS = [
   "./src/modules/habits/model.js",
   "./src/modules/habits/routes.js",
   "./src/modules/habits/storage.js",
-  "./src/modules/habits/screens/_shared.js",
+  "./src/modules/habits/screens/shared.js",
   "./src/modules/habits/screens/calendar.js",
   "./src/modules/habits/screens/day.js",
   "./src/modules/habits/screens/detail.js",
