@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ketting</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ketting">
+<meta name="theme-color" content="#12161D">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12161D;
+    --surface: #1B222C;
+    --line: #2A3442;
+    --text: #EDE7DB;
+    --muted: #8A94A3;
+    --amber: #E9A13B;
+    --amber-soft: rgba(233, 161, 59, 0.14);
+    --green: #6FBF9A;
+    --radius: 14px;
+    --display: "Barlow Semi Condensed", -apple-system, sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    padding: max(20px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+    max-width: 480px;
+    margin: 0 auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- header ---------- */
+  header { margin-bottom: 22px; }
+  .weekday {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .date { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .quote {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 15px;
+  }
+  .quote .who { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* ---------- secties ---------- */
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 26px 0 10px;
+  }
+
+  /* ---------- habit-kaarten ---------- */
+  .habit {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .habit.done { border-color: rgba(111, 191, 154, 0.45); }
+  .habit .info { flex: 1; min-width: 0; }
+  .habit .name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.15;
+  }
+  .habit .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .habit .streak {
+    font-variant-numeric: tabular-nums;
+    color: var(--amber);
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .habit .streak.zero { color: var(--muted); font-weight: 400; }
+  .check {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    border: 2px solid var(--line);
+    background: transparent;
+    color: transparent;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .check.on {
+    background: var(--green);
+    border-color: var(--green);
+    color: #12161D;
+  }
+  .check:active { transform: scale(0.92); }
+  .resting { color: var(--muted); font-size: 14px; padding: 6px 2px; }
+
+  /* ---------- de ketting ---------- */
+  .chain-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .chain-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .chain { display: flex; gap: 6px; }
+  .chain .slot { flex: 1; text-align: center; }
+  .chain .block {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .chain .block.filled { background: var(--amber); border-color: var(--amber); }
+  .chain .block.off { opacity: 0.25; }
+  .chain .block.today { border-color: var(--amber); }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(233, 161, 59, 0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(233, 161, 59, 0); }
+  }
+  .chain .block.today:not(.filled) { animation: pulse 2.4s infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .chain .block.today:not(.filled) { animation: none; }
+    .check, .chain .block { transition: none; }
+  }
+  .chain .lbl { font-size: 11px; color: var(--muted); margin-top: 5px; display: block; }
+
+  /* ---------- muziek ---------- */
+  .playlist-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--amber);
+    color: #12161D;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .playlist-btn:active { opacity: 0.85; }
+
+  /* ---------- beheer ---------- */
+  details { margin-top: 30px; }
+  summary {
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    list-style: none;
+    padding: 8px 0;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "+ "; color: var(--amber); }
+  details[open] summary::before { content: "− "; }
+  .manage {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 8px;
+  }
+  .manage label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 5px; }
+  .manage label:first-child { margin-top: 0; }
+  input[type="text"], input[type="url"] {
+    width: 100%;
+    padding: 11px 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 16px;
+    font-family: var(--body);
+  }
+  input:focus { outline: 2px solid var(--amber); outline-offset: 1px; border-color: transparent; }
+  .daypick { display: flex; gap: 6px; }
+  .daypick button {
+    flex: 1;
+    padding: 9px 0;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .daypick button.sel {
+    background: var(--amber-soft);
+    border-color: var(--amber);
+    color: var(--amber);
+    font-weight: 600;
+  }
+  .btn {
+    margin-top: 14px;
+    width: 100%;
+    padding: 12px;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .habit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .habit-row:last-child { border-bottom: none; }
+  .habit-row .del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 18px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="weekday" id="weekday"></div>
+  <div class="date" id="date"></div>
+  <div class="quote" id="quote"></div>
+</header>
+
+<h2>Vandaag</h2>
+<div id="today"></div>
+
+<h2>De ketting</h2>
+<div id="chains"></div>
+
+<h2>Muziek</h2>
+<div id="music"></div>
+
+<details>
+  <summary>Beheer</summary>
+  <div class="manage">
+    <label for="newName">Nieuwe gewoonte</label>
+    <input type="text" id="newName" placeholder="Bijv. lezen, 10k stappen, mobility">
+    <label>Op welke dagen?</label>
+    <div class="daypick" id="daypick"></div>
+    <p class="hint">Niets geselecteerd betekent elke dag.</p>
+    <button class="btn" id="addBtn">Gewoonte toevoegen</button>
+
+    <label style="margin-top:22px">Playlist (Spotify of YouTube link)</label>
+    <input type="url" id="playlistInput" placeholder="https://open.spotify.com/playlist/...">
+    <button class="btn ghost" id="saveUrlBtn">Playlist opslaan</button>
+
+    <label style="margin-top:22px">Gewoonten</label>
+    <div id="habitList"></div>
+
+    <button class="btn ghost" id="exportBtn" style="margin-top:22px">Data kopiëren als JSON</button>
+  </div>
+</details>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ---------- opslag met fallback ----------
+   localStorage waar het kan (GitHub Pages, PWA),
+   anders in het geheugen (bijv. in een preview-omgeving). */
+const store = (() => {
+  let mem = null;
+  const KEY = "ketting-v1";
+  return {
+    load() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) { /* geen localStorage beschikbaar */ }
+      return mem;
+    },
+    save(state) {
+      mem = state;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ok */ }
+    }
+  };
+})();
+
+/* ---------- state ---------- */
+const DAGEN = ["zo", "ma", "di", "wo", "do", "vr", "za"];
+const DAGEN_LANG = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag"];
+const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
+
+let state = store.load() || {
+  habits: [
+    { id: "gym", name: "Gym", days: [1, 3, 5], history: {} }
+  ],
+  playlist: ""
+};
+
+const QUOTES = [
+  { t: "De beste training is de training die je doet.", w: "" },
+  { t: "Discipline is kiezen tussen wat je nu wilt en wat je het meest wilt.", w: "" },
+  { t: "We are what we repeatedly do.", w: "Aristoteles" },
+  { t: "Je hoeft niet gemotiveerd te zijn. Je moet er alleen zijn.", w: "" },
+  { t: "It's not about having time. It's about making time.", w: "" },
+  { t: "Kleine stappen, elke dag. Dat is de hele truc.", w: "" },
+  { t: "The pain of discipline weighs ounces. The pain of regret weighs tons.", w: "Jim Rohn" },
+  { t: "Verbreek de ketting niet.", w: "" },
+  { t: "Sterker worden begint met opdagen.", w: "" },
+  { t: "Motivatie brengt je op gang. Gewoonte houdt je op gang.", w: "Jim Ryun" },
+  { t: "You don't rise to your goals. You fall to your systems.", w: "James Clear" },
+  { t: "De sportschool onthoudt niet wat je zei. Wel dat je kwam.", w: "" },
+  { t: "Vandaag is de enige dag waarop je iets kan doen.", w: "" },
+  { t: "One workout at a time.", w: "" }
+];
+
+/* ---------- datumhelpers ---------- */
+function keyOf(d) {
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+function daysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d;
+}
+function isScheduled(habit, d) {
+  return !habit.days || habit.days.length === 0 || habit.days.includes(d.getDay());
+}
+function doneOn(habit, d) {
+  return !!habit.history[keyOf(d)];
+}
+
+/* ---------- streak: aaneengesloten geplande dagen gedaan ---------- */
+function streak(habit) {
+  let count = 0;
+  for (let i = 0; i < 3650; i++) {
+    const d = daysAgo(i);
+    if (!isScheduled(habit, d)) continue;
+    if (doneOn(habit, d)) { count++; continue; }
+    if (i === 0) continue;   // vandaag nog niet gedaan breekt de streak niet
+    break;
+  }
+  return count;
+}
+
+/* ---------- render ---------- */
+function scheduleLabel(habit) {
+  if (!habit.days || habit.days.length === 0) return "elke dag";
+  if (habit.days.length === 7) return "elke dag";
+  return [1, 2, 3, 4, 5, 6, 0].filter(d => habit.days.includes(d)).map(d => DAGEN[d]).join(" ");
+}
+
+function render() {
+  const now = new Date();
+
+  // header
+  document.getElementById("weekday").textContent = DAGEN_LANG[now.getDay()];
+  document.getElementById("date").textContent = `${now.getDate()} ${MAANDEN[now.getMonth()]} ${now.getFullYear()}`;
+
+  const q = QUOTES[Math.floor(now.getTime() / 86400000) % QUOTES.length];
+  document.getElementById("quote").innerHTML =
+    `${esc(q.t)}${q.w ? `<span class="who">${esc(q.w)}</span>` : ""}`;
+
+  // vandaag
+  const todayEl = document.getElementById("today");
+  todayEl.innerHTML = "";
+  const active = state.habits.filter(h => isScheduled(h, now));
+  if (state.habits.length === 0) {
+    todayEl.innerHTML = `<p class="resting">Nog geen gewoonten. Voeg er een toe via beheer hieronder.</p>`;
+  } else if (active.length === 0) {
+    todayEl.innerHTML = `<p class="resting">Rustdag. Niets gepland voor vandaag.</p>`;
+  }
+  for (const h of active) {
+    const done = doneOn(h, now);
+    const s = streak(h);
+    const card = document.createElement("div");
+    card.className = "habit" + (done ? " done" : "");
+    card.innerHTML = `
+      <div class="info">
+        <div class="name">${esc(h.name)}</div>
+        <div class="meta">${scheduleLabel(h)}</div>
+      </div>
+      <span class="streak ${s === 0 ? "zero" : ""}">${s === 0 ? "start je ketting" : "ketting × " + s}</span>
+      <button class="check ${done ? "on" : ""}" aria-label="${esc(h.name)} ${done ? "gedaan" : "afvinken"}">✓</button>`;
+    card.querySelector(".check").addEventListener("click", () => toggle(h.id));
+    todayEl.appendChild(card);
+  }
+
+  // ketting: laatste 7 dagen per gewoonte
+  const chainsEl = document.getElementById("chains");
+  chainsEl.innerHTML = "";
+  for (const h of state.habits) {
+    const card = document.createElement("div");
+    card.className = "chain-card";
+    let slots = "";
+    for (let i = 6; i >= 0; i--) {
+      const d = daysAgo(i);
+      const cls = [
+        "block",
+        doneOn(h, d) ? "filled" : "",
+        isScheduled(h, d) ? "" : "off",
+        i === 0 ? "today" : ""
+      ].join(" ");
+      slots += `<div class="slot"><div class="${cls}"></div><span class="lbl">${DAGEN[d.getDay()]}</span></div>`;
+    }
+    card.innerHTML = `<div class="chain-name">${esc(h.name)}</div><div class="chain">${slots}</div>`;
+    chainsEl.appendChild(card);
+  }
+
+  // muziek
+  const musicEl = document.getElementById("music");
+  if (state.playlist) {
+    musicEl.innerHTML = `<a class="playlist-btn" href="${esc(state.playlist)}" target="_blank" rel="noopener">Start playlist</a>`;
+  } else {
+    musicEl.innerHTML = `<p class="resting">Sla een playlistlink op via beheer, dan verschijnt hier een startknop.</p>`;
+  }
+
+  // beheer: lijst
+  const listEl = document.getElementById("habitList");
+  listEl.innerHTML = state.habits.length === 0 ? `<p class="hint">Nog geen gewoonten.</p>` : "";
+  for (const h of state.habits) {
+    const row = document.createElement("div");
+    row.className = "habit-row";
+    row.innerHTML = `<span>${esc(h.name)} <span class="hint" style="display:inline">(${scheduleLabel(h)})</span></span>
+      <button class="del">verwijder</button>`;
+    row.querySelector(".del").addEventListener("click", () => removeHabit(h.id));
+    listEl.appendChild(row);
+  }
+
+  document.getElementById("playlistInput").value = state.playlist || "";
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ---------- acties ---------- */
+function toggle(id) {
+  const h = state.habits.find(x => x.id === id);
+  if (!h) return;
+  const k = keyOf(new Date());
+  if (h.history[k]) delete h.history[k];
+  else h.history[k] = true;
+  store.save(state);
+  render();
+}
+
+function removeHabit(id) {
+  const h = state.habits.find(x => x.id === id);
+  if (!h) return;
+  if (!confirm(`"${h.name}" en de bijbehorende geschiedenis verwijderen?`)) return;
+  state.habits = state.habits.filter(x => x.id !== id);
+  store.save(state);
+  render();
+}
+
+/* dagkiezer voor nieuwe gewoonte */
+let pickedDays = [];
+const daypick = document.getElementById("daypick");
+[1, 2, 3, 4, 5, 6, 0].forEach(d => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = DAGEN[d];
+  b.addEventListener("click", () => {
+    if (pickedDays.includes(d)) pickedDays = pickedDays.filter(x => x !== d);
+    else pickedDays.push(d);
+    b.classList.toggle("sel");
+  });
+  daypick.appendChild(b);
+});
+
+document.getElementById("addBtn").addEventListener("click", () => {
+  const name = document.getElementById("newName").value.trim();
+  if (!name) { toast("Geef de gewoonte een naam"); return; }
+  state.habits.push({
+    id: "h" + Date.now(),
+    name,
+    days: pickedDays.length ? [...pickedDays] : null,
+    history: {}
+  });
+  store.save(state);
+  document.getElementById("newName").value = "";
+  pickedDays = [];
+  daypick.querySelectorAll("button").forEach(b => b.classList.remove("sel"));
+  toast("Toegevoegd");
+  render();
+});
+
+document.getElementById("saveUrlBtn").addEventListener("click", () => {
+  state.playlist = document.getElementById("playlistInput").value.trim();
+  store.save(state);
+  toast(state.playlist ? "Playlist opgeslagen" : "Playlist verwijderd");
+  render();
+});
+
+document.getElementById("exportBtn").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(state, null, 2));
+    toast("Gekopieerd naar klembord");
+  } catch (e) {
+    toast("Kopiëren lukte niet");
+  }
+});
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+}
+
+/* ---------- service worker voor offline gebruik ---------- */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+/* dagwissel: opnieuw renderen als de app weer zichtbaar wordt */
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) render();
+});
+
+render();
+</script>
+</body>
+</html>
