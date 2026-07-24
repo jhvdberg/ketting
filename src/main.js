@@ -14,6 +14,8 @@ import { el } from "./core/ui/dom.js";
 
 import { gymModule } from "./modules/gym/index.js";
 import { registerGymRoutes } from "./modules/gym/routes.js";
+import { alcoholModule } from "./modules/alcohol/index.js";
+import { registerAlcoholRoutes } from "./modules/alcohol/routes.js";
 import { habitsModule } from "./modules/habits/index.js";
 import { registerHabitsRoutes } from "./modules/habits/routes.js";
 import renderHome from "./screens/home.js";
@@ -21,6 +23,7 @@ import renderSettings from "./screens/settings.js";
 import renderNotFound from "./screens/notFound.js";
 
 registerModule(gymModule);
+registerModule(alcoholModule);
 registerModule(habitsModule);
 
 async function migrateModules(db) {
@@ -82,6 +85,7 @@ async function boot() {
     registerRoute("/", renderHome);
     registerRoute("/settings", renderSettings);
     registerGymRoutes();
+    registerAlcoholRoutes();
     registerHabitsRoutes();
     registerNotFound(renderNotFound);
 

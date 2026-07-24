@@ -114,7 +114,7 @@ export default async function renderSettings(container) {
   container.appendChild(el("h2", { class: "section", text: "Alle lokale data verwijderen" }));
   container.appendChild(
     el("div", { class: "card" }, [
-      el("p", { class: "hint", text: "Verwijdert alle gegevens van alle modules (Gym, Habits en toekomstige modules) definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren." }),
+      el("p", { class: "hint", text: `Verwijdert alle gegevens van alle modules (${getModules().map((m) => m.name).join(", ")}) definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren.` }),
       el("button", {
         class: "btn danger",
         type: "button",

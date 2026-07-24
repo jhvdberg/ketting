@@ -4,7 +4,7 @@
  * handmatig gesynchroniseerd met src/core/version.js bij elke release die
  * bestanden toevoegt of wijzigt.
  */
-const CACHE_VERSION = "ketting-v2.1.0";
+const CACHE_VERSION = "ketting-v2.2.0";
 const ASSETS = [
   "./",
   "./index.html",
@@ -69,6 +69,23 @@ const ASSETS = [
   "./src/modules/gym/screens/muscleGroupChart.js",
   "./src/modules/gym/screens/archivedCycles.js",
   "./src/modules/gym/screens/archivedCycleDetail.js",
+  "./src/modules/alcohol/index.js",
+  "./src/modules/alcohol/routes.js",
+  "./src/modules/alcohol/storage.js",
+  "./src/modules/alcohol/model.js",
+  "./src/modules/alcohol/analysis.js",
+  "./src/modules/alcohol/impactContent.js",
+  "./src/modules/alcohol/migrations.js",
+  "./src/modules/alcohol/screens/shared.js",
+  "./src/modules/alcohol/screens/alcoholHome.js",
+  "./src/modules/alcohol/screens/schedule.js",
+  "./src/modules/alcohol/screens/dayEntry.js",
+  "./src/modules/alcohol/screens/missingEntries.js",
+  "./src/modules/alcohol/screens/calendar.js",
+  "./src/modules/alcohol/screens/analysisOverview.js",
+  "./src/modules/alcohol/screens/periodComparisons.js",
+  "./src/modules/alcohol/screens/wildcardOverview.js",
+  "./src/modules/alcohol/screens/impactView.js",
 ];
 
 self.addEventListener("install", (event) => {
