@@ -1,7 +1,7 @@
 {
   "name": "Ketting",
   "short_name": "Ketting",
-  "description": "Gym en habits tracker",
+  "description": "Persoonlijke tracking-app voor training, alcoholgebruik en gewoonten",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
