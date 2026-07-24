@@ -4,7 +4,7 @@
  * handmatig gesynchroniseerd met src/core/version.js bij elke release die
  * bestanden toevoegt of wijzigt.
  */
-const CACHE_VERSION = "ketting-v2.0.1";
+const CACHE_VERSION = "ketting-v2.1.0";
 const ASSETS = [
   "./",
   "./index.html",
@@ -44,6 +44,31 @@ const ASSETS = [
   "./src/modules/habits/screens/habitsHome.js",
   "./src/modules/habits/screens/list.js",
   "./src/modules/habits/screens/streaks.js",
+  "./src/modules/gym/index.js",
+  "./src/modules/gym/routes.js",
+  "./src/modules/gym/storage.js",
+  "./src/modules/gym/model.js",
+  "./src/modules/gym/cycleModel.js",
+  "./src/modules/gym/classification.js",
+  "./src/modules/gym/migrations.js",
+  "./src/modules/gym/charts.js",
+  "./src/modules/gym/screens/shared.js",
+  "./src/modules/gym/screens/gymHome.js",
+  "./src/modules/gym/screens/exerciseList.js",
+  "./src/modules/gym/screens/exerciseEditor.js",
+  "./src/modules/gym/screens/templateLibrary.js",
+  "./src/modules/gym/screens/templateEditor.js",
+  "./src/modules/gym/screens/cycleList.js",
+  "./src/modules/gym/screens/cycleEditor.js",
+  "./src/modules/gym/screens/activeCycleOverview.js",
+  "./src/modules/gym/screens/plannedWorkoutEditor.js",
+  "./src/modules/gym/screens/activeWorkout.js",
+  "./src/modules/gym/screens/calendar.js",
+  "./src/modules/gym/screens/workoutDetail.js",
+  "./src/modules/gym/screens/exerciseChart.js",
+  "./src/modules/gym/screens/muscleGroupChart.js",
+  "./src/modules/gym/screens/archivedCycles.js",
+  "./src/modules/gym/screens/archivedCycleDetail.js",
 ];
 
 self.addEventListener("install", (event) => {

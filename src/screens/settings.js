@@ -114,7 +114,7 @@ export default async function renderSettings(container) {
   container.appendChild(el("h2", { class: "section", text: "Alle lokale data verwijderen" }));
   container.appendChild(
     el("div", { class: "card" }, [
-      el("p", { class: "hint", text: "Verwijdert alle habits, geschiedenis en instellingen definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren." }),
+      el("p", { class: "hint", text: "Verwijdert alle gegevens van alle modules (Gym, Habits en toekomstige modules) definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren." }),
       el("button", {
         class: "btn danger",
         type: "button",
@@ -122,7 +122,7 @@ export default async function renderSettings(container) {
         onClick: async () => {
           const ok = await confirmDialog({
             title: "Alle data verwijderen",
-            body: "Alle habits, hun geschiedenis en streaks worden definitief verwijderd van dit apparaat. Dit kan niet ongedaan worden gemaakt. Exporteer eerst een back-up als je iets wilt bewaren.",
+            body: "Alle gegevens van alle modules worden definitief verwijderd van dit apparaat. Dit kan niet ongedaan worden gemaakt. Exporteer eerst een back-up als je iets wilt bewaren.",
             confirmLabel: "Definitief verwijderen",
             danger: true,
           });

@@ -12,12 +12,15 @@ import { loadSchemaState, saveSchemaState, CORE_META_STORE_DEF } from "./core/sc
 import { logError } from "./core/errors.js";
 import { el } from "./core/ui/dom.js";
 
+import { gymModule } from "./modules/gym/index.js";
+import { registerGymRoutes } from "./modules/gym/routes.js";
 import { habitsModule } from "./modules/habits/index.js";
 import { registerHabitsRoutes } from "./modules/habits/routes.js";
 import renderHome from "./screens/home.js";
 import renderSettings from "./screens/settings.js";
 import renderNotFound from "./screens/notFound.js";
 
+registerModule(gymModule);
 registerModule(habitsModule);
 
 async function migrateModules(db) {
@@ -78,6 +81,7 @@ async function boot() {
 
     registerRoute("/", renderHome);
     registerRoute("/settings", renderSettings);
+    registerGymRoutes();
     registerHabitsRoutes();
     registerNotFound(renderNotFound);
 
