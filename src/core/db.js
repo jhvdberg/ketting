@@ -55,7 +55,12 @@ export async function openDatabase({ name, version, stores }) {
   const currentVersion = probe.version;
   probe.close();
 
-  const targetVersion = missing && currentVersion >= version ? currentVersion + 1 : version;
+  // Nooit een lager versienummer aanvragen dan wat al lokaal is opgeslagen
+  // (indexedDB.open gooit anders een VersionError) — ook niet wanneer een
+  // eerdere reparatie het lokale versienummer al voorbij de vaste
+  // DB_VERSION-constante heeft opgehoogd.
+  let targetVersion = Math.max(version, currentVersion);
+  if (missing && targetVersion === currentVersion) targetVersion += 1;
   return openAtVersion(name, targetVersion, stores);
 }
 
