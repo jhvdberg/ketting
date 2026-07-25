@@ -16,12 +16,9 @@ function reqToPromise(req) {
   });
 }
 
-/**
- * @param {{name: string, version: number, stores: Array<{name: string, keyPath: string, indexes?: Array<{name: string, keyPath: string, options?: object}>}>}} config
- */
-export function openDatabase({ name, version, stores }) {
+function openAtVersion(name, version, stores) {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(name, version);
+    const req = version == null ? indexedDB.open(name) : indexedDB.open(name, version);
     req.onupgradeneeded = () => {
       const db = req.result;
       for (const s of stores) {
@@ -38,6 +35,28 @@ export function openDatabase({ name, version, stores }) {
     req.onblocked = () =>
       reject(new Error("De database-upgrade is geblokkeerd: sluit andere open tabs van deze app en probeer opnieuw."));
   });
+}
+
+/**
+ * @param {{name: string, version: number, stores: Array<{name: string, keyPath: string, indexes?: Array<{name: string, keyPath: string, options?: object}>}>}} config
+ */
+export async function openDatabase({ name, version, stores }) {
+  // Sommige WebKit-versies (met name iOS Safari) laten een versionchange-
+  // transactie soms voortijdig afbreken (bv. wanneer de app tijdens een
+  // eerdere upgrade naar de achtergrond ging), waardoor de database wel op
+  // het nieuwe versienummer blijft staan maar één of meer object stores
+  // nooit zijn aangemaakt. Omdat onupgradeneeded dan bij een normale open()
+  // niet meer vuurt (het versienummer klopt immers al), zou zo'n store voor
+  // altijd ontbreken. Daarom eerst zonder versie openen om de werkelijke
+  // staat te controleren, en zo nodig repareren met een extra, niet-
+  // destructieve upgrade die alleen de ontbrekende stores aanmaakt.
+  const probe = await openAtVersion(name, undefined, stores);
+  const missing = stores.some((s) => !probe.objectStoreNames.contains(s.name));
+  const currentVersion = probe.version;
+  probe.close();
+
+  const targetVersion = missing && currentVersion >= version ? currentVersion + 1 : version;
+  return openAtVersion(name, targetVersion, stores);
 }
 
 export function getAll(db, storeName) {

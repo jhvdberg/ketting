@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.2.2";
+export const APP_VERSION = "2.2.3";
 export const CORE_SCHEMA_VERSION = 1;
 export const EXPORT_FORMAT = "personal-tracker-backup";
 export const EXPORT_FORMAT_VERSION = 1;
