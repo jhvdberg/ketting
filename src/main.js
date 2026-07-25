@@ -73,6 +73,15 @@ function showUpdateBanner(apply) {
 }
 
 async function boot() {
+  // Service-workerregistratie staat bewust buiten de try/catch en vóór het
+  // openen van de database: als het opstarten faalt (bv. door een lokaal
+  // databaseprobleem), moet de update-banner alsnog kunnen verschijnen zodat
+  // een gebruiker een gerepareerde appversie kan ophalen. Stond dit binnen
+  // het try-blok, dan zou een falende boot() nooit bij serviceworker-
+  // detectie komen en zou een gebruiker voor altijd vastzitten op een oude,
+  // gecachte, kapotte versie.
+  initServiceWorker({ onUpdateReady: showUpdateBanner });
+
   try {
     const stores = [...getAllStoreDefs(), CORE_META_STORE_DEF];
     const db = await openDatabase({ name: DB_NAME, version: DB_VERSION, stores });
@@ -90,8 +99,6 @@ async function boot() {
     registerNotFound(renderNotFound);
 
     await initRouter(document.getElementById("app"));
-
-    initServiceWorker({ onUpdateReady: showUpdateBanner });
   } catch (err) {
     logError("boot", err);
     renderFatalError(err && err.message ? err.message : "Onbekende fout. Probeer de pagina te herladen.");
