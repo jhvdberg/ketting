@@ -35,6 +35,7 @@ export default async function renderAnalysisOverview(container) {
   list.appendChild(stat("Dagen binnen limiet", a.withinDays));
   list.appendChild(stat("Overschrijdingen", a.exceededDays));
   list.appendChild(stat("Wildcarddagen", a.wildcardDays));
+  list.appendChild(stat("Dagen zonder maximum", a.noLimitDays));
   list.appendChild(stat("Niet-geregistreerde dagen", a.missingDays));
   list.appendChild(stat("Registratiegraad", formatPercent(a.registrationRate)));
   list.appendChild(stat("Nalevingspercentage", formatPercent(a.complianceRate)));

@@ -61,6 +61,8 @@ export function periodStats(records, schedules, fromDate, toDate) {
   let exceededDays = 0;
   let wildcardDays = 0;
   let wildcardGlasses = 0;
+  let noLimitDays = 0;
+  let noLimitGlasses = 0;
   let missingDays = 0;
   let registeredDays = 0;
   let calendarDays = 0;
@@ -91,6 +93,14 @@ export function periodStats(records, schedules, fromDate, toDate) {
       wildcardGlasses += record.total;
       continue;
     }
+    if (record.status === DAY_STATUS.NO_LIMIT) {
+      // Geen maximum die dag: niets om aan te toetsen, dus net als wildcards
+      // uitgesloten van naleving en beoordeeld gebruik/limiet (op verzoek
+      // van de gebruiker, niet uit de oorspronkelijke briefing).
+      noLimitDays += 1;
+      noLimitGlasses += record.total;
+      continue;
+    }
     assessedUsage += record.total;
     assessedLimit += record.appliedLimit;
     if (record.status === DAY_STATUS.WITHIN_LIMIT) withinDays += 1;
@@ -114,6 +124,8 @@ export function periodStats(records, schedules, fromDate, toDate) {
     exceededDays,
     wildcardDays,
     wildcardGlasses,
+    noLimitDays,
+    noLimitGlasses,
     missingDays,
     registeredDays,
     calendarDays,

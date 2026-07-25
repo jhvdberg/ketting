@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DAY_STATUS } from "../../../src/modules/alcohol/model.js";
+import { DAY_STATUS, NO_LIMIT, computeDayStatus } from "../../../src/modules/alcohol/model.js";
 import {
   unifiedDayStatus,
   missingDates,
@@ -57,6 +57,25 @@ test("periodStats: wildcard negeert de limiet voor naleving maar telt mee in tot
   assert.equal(stats.assessedUsage, 5); // 1 + 4
   assert.equal(stats.assessedLimit, 4); // 2 + 2
   assert.equal(stats.usageVsAssessedLimit, 1.25);
+});
+
+test("periodStats: een dag zonder maximum telt niet mee in naleving of beoordeeld gebruik/limiet, wel in het totaal (op verzoek toegevoegd)", () => {
+  const records = [
+    record("2024-01-01", 1), // binnen limiet
+    record("2024-01-02", 9, { appliedLimit: NO_LIMIT, status: computeDayStatus(9, NO_LIMIT, false) }), // geen maximum
+    record("2024-01-03", 4), // overschrijding
+  ];
+  const stats = periodStats(records, SCHEDULE, "2024-01-01", "2024-01-03");
+
+  assert.equal(stats.totalGlasses, 14); // 1 + 9 + 4, telt gewoon mee in het totaal
+  assert.equal(stats.noLimitDays, 1);
+  assert.equal(stats.noLimitGlasses, 9);
+  // net als wildcards: uitgesloten van naleving en beoordeeld gebruik/limiet
+  assert.equal(stats.withinDays, 1);
+  assert.equal(stats.exceededDays, 1);
+  assert.equal(stats.complianceRate, 0.5);
+  assert.equal(stats.assessedUsage, 5); // 1 + 4, de dag zonder maximum telt niet mee
+  assert.equal(stats.assessedLimit, 4);
 });
 
 test("buildDiffs: geen procentuele verandering wanneer de referentiewaarde 0 is (7.17)", () => {

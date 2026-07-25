@@ -1,4 +1,10 @@
 export { screenHeader } from "../../../core/ui/header.js";
+import { NO_LIMIT } from "../model.js";
+
+export function formatLimit(limit) {
+  if (limit == null) return "onbekend (nog geen schema)";
+  return limit === NO_LIMIT ? "geen maximum" : String(limit);
+}
 
 export const MONTHS_LONG = [
   "januari", "februari", "maart", "april", "mei", "juni",

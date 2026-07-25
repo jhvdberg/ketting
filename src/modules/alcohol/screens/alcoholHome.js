@@ -5,7 +5,7 @@ import { todayISO } from "../../../core/dateUtils.js";
 import { listDays, listSchedules, getModuleStart } from "../storage.js";
 import { getLimitForDate } from "../model.js";
 import { missingDates } from "../analysis.js";
-import { screenHeader, statusPillClass } from "./shared.js";
+import { screenHeader, statusPillClass, formatLimit } from "./shared.js";
 
 export default async function renderAlcoholHome(container) {
   const db = getDb();
@@ -33,7 +33,7 @@ export default async function renderAlcoholHome(container) {
   container.appendChild(
     el("a", { class: "card tappable", href: "#/alcohol/day" }, [
       el("div", { class: "row" }, [
-        el("div", { class: "info" }, [el("div", { class: "name", text: "Vandaag" }), el("div", { class: "meta", text: `Limiet: ${limit}` })]),
+        el("div", { class: "info" }, [el("div", { class: "name", text: "Vandaag" }), el("div", { class: "meta", text: `Limiet: ${formatLimit(limit)}` })]),
         todayRecord
           ? el("span", { class: statusPillClass(todayRecord.status), text: todayRecord.status })
           : el("span", { class: "status-pill", text: "Niet geregistreerd" }),

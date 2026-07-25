@@ -9,7 +9,7 @@ import { ALCOHOL_SCHEMA_VERSION } from "../migrations.js";
 import { missingDates } from "../analysis.js";
 import { confirmDialog } from "../../../core/ui/confirm.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader, statusPillClass } from "./shared.js";
+import { screenHeader, statusPillClass, formatLimit } from "./shared.js";
 
 const WEEKDAY_LONG = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"];
 const MONTHS_LONG = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
@@ -72,7 +72,9 @@ export default async function renderDayEntry(container, params) {
     wildcardBtn.textContent = wildcard ? "Wildcard actief" : "Wildcard activeren";
   });
   container.appendChild(wildcardBtn);
-  container.appendChild(el("p", { class: "hint", text: `Geldende daglimiet: ${limit}. Een wildcard negeert de limiet voor de naleving, maar de glazen tellen wel mee in het totaalgebruik.` }));
+  container.appendChild(
+    el("p", { class: "hint", text: `Geldende daglimiet: ${formatLimit(limit)}. Een wildcard negeert de limiet voor de naleving, maar de glazen tellen wel mee in het totaalgebruik.` })
+  );
 
   const errorEl = el("p", { class: "field-error" });
   container.appendChild(errorEl);

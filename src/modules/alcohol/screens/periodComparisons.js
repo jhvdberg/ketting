@@ -11,6 +11,7 @@ const COMPARISON_METRICS = [
   ["withinDays", "Dagen binnen limiet"],
   ["exceededDays", "Overschrijdingen"],
   ["wildcardDays", "Wildcarddagen"],
+  ["noLimitDays", "Dagen zonder maximum"],
   ["confirmedFreeDays", "Alcoholvrije dagen"],
   ["assessedUsage", "Beoordeeld gebruik"],
   ["assessedLimit", "Beoordeelde limiet"],

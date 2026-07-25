@@ -8,6 +8,7 @@ import { STORE_DEFS, listDays, listSchedules, getModuleStart, exportAll, replace
 import { ALCOHOL_SCHEMA_VERSION, migrateAlcoholData, emptyAlcoholData } from "./migrations.js";
 import { isValidCount, isValidScheduleDays, DAY_STATUS, getLimitForDate } from "./model.js";
 import { missingDates, periodStats } from "./analysis.js";
+import { formatLimit } from "./screens/shared.js";
 
 function importValidate(data) {
   const errors = [];
@@ -97,7 +98,7 @@ export const alcoholModule = {
       el("div", { class: "row" }, [
         el("div", { class: "info" }, [
           el("div", { class: "name", text: "Alcohol" }),
-          el("div", { class: "meta", text: `Limiet vandaag: ${limit} · ${todayRecord ? `${todayRecord.total} geregistreerd · ${todayRecord.status}` : "Nog niet geregistreerd"}` }),
+          el("div", { class: "meta", text: `Limiet vandaag: ${formatLimit(limit)} · ${todayRecord ? `${todayRecord.total} geregistreerd · ${todayRecord.status}` : "Nog niet geregistreerd"}` }),
         ]),
       ]),
     ]);

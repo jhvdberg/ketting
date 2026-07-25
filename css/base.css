@@ -101,6 +101,8 @@ h2.section {
 h2.section:first-child { margin-top: 4px; }
 
 .card {
+  display: block;
+  text-decoration: none;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);

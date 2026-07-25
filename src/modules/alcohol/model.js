@@ -13,14 +13,28 @@ export const DAY_STATUS = {
   WITHIN_LIMIT: "Binnen limiet",
   EXCEEDED: "Limiet overschreden",
   WILDCARD: "Wildcard gebruikt",
+  NO_LIMIT: "Geen limiet",
 };
+
+/**
+ * Sentinelwaarde in een schema-dag voor "geen maximum" (op verzoek van de
+ * gebruiker toegevoegd, niet in de oorspronkelijke briefing). Losstaand van
+ * `null`, dat gereserveerd blijft voor "er gold nog geen schema op deze
+ * datum" (zie getLimitForDate). -1 is JSON/IndexedDB-veilig, in
+ * tegenstelling tot bv. Infinity.
+ */
+export const NO_LIMIT = -1;
 
 export function isValidCount(n) {
   return Number.isInteger(n) && n >= 0;
 }
 
+export function isValidLimitValue(n) {
+  return n === NO_LIMIT || isValidCount(n);
+}
+
 export function isValidScheduleDays(days) {
-  return Array.isArray(days) && days.length === 7 && days.every((n) => isValidCount(n));
+  return Array.isArray(days) && days.length === 7 && days.every(isValidLimitValue);
 }
 
 export function dayTotal(record) {
@@ -49,10 +63,11 @@ export function getLimitForDate(schedules, dateISO) {
   return schedule.days[weekdayMon0(dateISO)];
 }
 
-/** Dagstatus op basis van totaal, geldende limiet en wildcard (7.7). */
+/** Dagstatus op basis van totaal, geldende limiet en wildcard (7.7, + geen-maximum). */
 export function computeDayStatus(total, limit, wildcard) {
   if (wildcard) return DAY_STATUS.WILDCARD;
   if (limit == null) return DAY_STATUS.NOT_ASSESSED;
+  if (limit === NO_LIMIT) return DAY_STATUS.NO_LIMIT;
   return total <= limit ? DAY_STATUS.WITHIN_LIMIT : DAY_STATUS.EXCEEDED;
 }
 

@@ -6,16 +6,24 @@ import {
   getLimitForDate,
   dayTotal,
   isValidCount,
+  isValidLimitValue,
   isValidScheduleDays,
   upsertScheduleVersion,
   getModuleStartDate,
   DAY_STATUS,
+  NO_LIMIT,
 } from "../../../src/modules/alcohol/model.js";
 
 test("computeDayStatus: binnen limiet, overschreden, wildcard (7.7)", () => {
   assert.equal(computeDayStatus(2, 3, false), DAY_STATUS.WITHIN_LIMIT);
   assert.equal(computeDayStatus(4, 3, false), DAY_STATUS.EXCEEDED);
   assert.equal(computeDayStatus(10, 0, true), DAY_STATUS.WILDCARD); // wildcard negeert de limiet
+});
+
+test("computeDayStatus: geen maximum geeft een eigen status, ongeacht het aantal glazen (op verzoek toegevoegd)", () => {
+  assert.equal(computeDayStatus(0, NO_LIMIT, false), DAY_STATUS.NO_LIMIT);
+  assert.equal(computeDayStatus(50, NO_LIMIT, false), DAY_STATUS.NO_LIMIT);
+  assert.equal(computeDayStatus(5, NO_LIMIT, true), DAY_STATUS.WILDCARD); // wildcard gaat altijd voor
 });
 
 test("historische limieten: een nieuw schema verandert eerdere dagen niet (7.6)", () => {
@@ -36,13 +44,16 @@ test("dayTotal telt de drie contexten op", () => {
   assert.equal(dayTotal({ solo: 1, together: 2, social: 3 }), 6);
 });
 
-test("isValidCount / isValidScheduleDays", () => {
+test("isValidCount / isValidLimitValue / isValidScheduleDays", () => {
   assert.equal(isValidCount(0), true);
   assert.equal(isValidCount(-1), false);
   assert.equal(isValidCount(1.5), false);
+  assert.equal(isValidLimitValue(NO_LIMIT), true); // -1 is geldig als "geen maximum"-sentinel
+  assert.equal(isValidLimitValue(-2), false); // maar niet zomaar elk negatief getal
   assert.equal(isValidScheduleDays([0, 1, 2, 3, 4, 5, 6]), true);
   assert.equal(isValidScheduleDays([0, 1, 2]), false);
-  assert.equal(isValidScheduleDays([0, 1, 2, 3, 4, 5, -1]), false);
+  assert.equal(isValidScheduleDays([0, 1, 2, 3, 4, 5, NO_LIMIT]), true); // geen maximum op zondag
+  assert.equal(isValidScheduleDays([0, 1, 2, 3, 4, 5, -2]), false);
 });
 
 test("upsertScheduleVersion overschrijft een versie met dezelfde ingangsdatum", () => {
