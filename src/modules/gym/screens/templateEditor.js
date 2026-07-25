@@ -7,7 +7,7 @@ import { generateId } from "../../../core/id.js";
 import { getTemplate, saveTemplate, listExercises } from "../storage.js";
 import { isCoreGroup, isValidSet } from "../model.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader } from "./shared.js";
+import { screenHeader, parseWeightInput } from "./shared.js";
 
 export default async function renderTemplateEditor(container, params) {
   const db = getDb();
@@ -72,7 +72,7 @@ export default async function renderTemplateEditor(container, params) {
           const weightInput = el("input", { type: "text", inputmode: "decimal", placeholder: "kg", style: "width:80px;" });
           weightInput.value = set.weight ?? "";
           weightInput.addEventListener("input", () => {
-            set.weight = weightInput.value === "" ? null : Number(weightInput.value);
+            set.weight = parseWeightInput(weightInput.value);
           });
           row.appendChild(weightInput);
         }

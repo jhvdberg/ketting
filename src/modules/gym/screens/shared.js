@@ -29,3 +29,14 @@ export function classificationColor(classification) {
 export function formatWeight(weight) {
   return weight == null ? "-" : `${weight} kg`;
 }
+
+/**
+ * Parseert gebruikersinvoer voor gewicht naar een getal. Een Nederlands
+ * decimaal toetsenbord (inputmode="decimal") levert een komma als
+ * decimaalteken (bv. "12,5"), terwijl Number() alleen een punt begrijpt en
+ * anders stil NaN teruggeeft.
+ */
+export function parseWeightInput(value) {
+  if (value === "") return null;
+  return Number(value.replace(",", "."));
+}

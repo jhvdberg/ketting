@@ -26,7 +26,7 @@ import {
   isSlotCompletedThisIteration,
 } from "../cycleModel.js";
 import { showToast } from "../../../core/ui/toast.js";
-import { screenHeader, classificationPillClass } from "./shared.js";
+import { screenHeader, classificationPillClass, parseWeightInput } from "./shared.js";
 
 export default async function renderPlannedWorkoutEditor(container, params) {
   const db = getDb();
@@ -124,7 +124,7 @@ export default async function renderPlannedWorkoutEditor(container, params) {
           const weightInput = el("input", { type: "text", inputmode: "decimal", placeholder: "kg", style: "width:80px;", disabled: locked });
           weightInput.value = set.weight ?? "";
           weightInput.addEventListener("input", () => {
-            set.weight = weightInput.value === "" ? null : Number(weightInput.value);
+            set.weight = parseWeightInput(weightInput.value);
             renderClassificationPreview();
           });
           row.appendChild(weightInput);
