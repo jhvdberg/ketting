@@ -84,3 +84,36 @@ export function exercisesFromPlannedWorkout(plannedWorkout) {
 export function templateExercisesFromPlannedWorkout(plannedWorkout) {
   return exercisesFromPlannedWorkout(plannedWorkout);
 }
+
+/**
+ * Groepeert actieve oefeningen per spiergroep (in de vaste MUSCLE_GROUPS-
+ * volgorde) voor de "oefening toevoegen"-dropdown, en sorteert binnen elke
+ * groep op gebruiksfrequentie (vaakst gebruikt eerst, bij gelijke stand
+ * alfabetisch). Gebruiksfrequentie wordt geteld op voltooide workouts —
+ * de sterkste indicator van daadwerkelijk gebruik, sterker dan hoe vaak
+ * iets alleen gepland is geweest.
+ */
+export function groupExercisesForPicker(exercises, completedWorkouts) {
+  const usageCounts = new Map();
+  for (const workout of completedWorkouts) {
+    for (const ex of workout.exercises) {
+      usageCounts.set(ex.exerciseId, (usageCounts.get(ex.exerciseId) || 0) + 1);
+    }
+  }
+  const byGroup = new Map();
+  for (const ex of exercises) {
+    if (!byGroup.has(ex.muscleGroup)) byGroup.set(ex.muscleGroup, []);
+    byGroup.get(ex.muscleGroup).push(ex);
+  }
+  const result = [];
+  for (const group of MUSCLE_GROUPS) {
+    const groupExercises = byGroup.get(group);
+    if (!groupExercises || groupExercises.length === 0) continue;
+    const sorted = [...groupExercises].sort((a, b) => {
+      const countDiff = (usageCounts.get(b.id) || 0) - (usageCounts.get(a.id) || 0);
+      return countDiff !== 0 ? countDiff : a.name.localeCompare(b.name);
+    });
+    result.push({ muscleGroup: group, exercises: sorted });
+  }
+  return result;
+}

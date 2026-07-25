@@ -16,7 +16,7 @@ import {
   getActiveSession,
   saveTemplate,
 } from "../storage.js";
-import { isCoreGroup, isValidSet, exercisesFromPlannedWorkout } from "../model.js";
+import { isCoreGroup, isValidSet, exercisesFromPlannedWorkout, groupExercisesForPicker } from "../model.js";
 import { classifyCompletedWorkout } from "../classification.js";
 import {
   CYCLE_STATUS,
@@ -55,6 +55,7 @@ export default async function renderPlannedWorkoutEditor(container, params) {
 
   const allExercises = (await listExercises(db)).filter((e) => e.active).sort((a, b) => a.name.localeCompare(b.name));
   const exerciseById = new Map((await listExercises(db)).map((e) => [e.id, e]));
+  const exerciseGroups = groupExercisesForPicker(allExercises, await listAllCompletedWorkouts(db));
 
   container.appendChild(screenHeader({ title: "Geplande workout", backTo }));
 
@@ -151,7 +152,13 @@ export default async function renderPlannedWorkoutEditor(container, params) {
   if (!locked) {
     const addExerciseSelect = el("select", {});
     addExerciseSelect.appendChild(el("option", { value: "", text: "Kies een oefening..." }));
-    for (const ex of allExercises) addExerciseSelect.appendChild(el("option", { value: ex.id, text: `${ex.name} (${ex.muscleGroup})` }));
+    for (const group of exerciseGroups) {
+      const optgroup = el("optgroup", { label: group.muscleGroup });
+      for (const ex of group.exercises) {
+        optgroup.appendChild(el("option", { value: ex.id, text: ex.name }));
+      }
+      addExerciseSelect.appendChild(optgroup);
+    }
     container.appendChild(el("label", { text: "Oefening toevoegen" }));
     container.appendChild(addExerciseSelect);
     container.appendChild(

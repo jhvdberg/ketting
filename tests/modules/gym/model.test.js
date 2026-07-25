@@ -9,6 +9,7 @@ import {
   isCoreGroup,
   exercisesFromTemplate,
   exercisesFromPlannedWorkout,
+  groupExercisesForPicker,
 } from "../../../src/modules/gym/model.js";
 
 test("exerciseVolume berekent gewicht × herhalingen, Core geeft null (6.20)", () => {
@@ -66,4 +67,31 @@ test("exercisesFromPlannedWorkout maakt een diepe kopie (6.13)", () => {
   const copy = exercisesFromPlannedWorkout(plannedWorkout);
   copy[0].sets.push({ weight: 50, reps: 5 });
   assert.equal(plannedWorkout.exercises[0].sets.length, 1);
+});
+
+test("groupExercisesForPicker groepeert per spiergroep in de vaste volgorde en sorteert op gebruik", () => {
+  const exercises = [
+    { id: "squat", name: "Squat", muscleGroup: "Legs" },
+    { id: "lunge", name: "Lunge", muscleGroup: "Legs" },
+    { id: "curl", name: "Curl", muscleGroup: "Biceps" },
+    { id: "bench", name: "Bankdrukken", muscleGroup: "Chest" },
+  ];
+  const completedWorkouts = [
+    { exercises: [{ exerciseId: "lunge" }, { exerciseId: "squat" }] },
+    { exercises: [{ exerciseId: "lunge" }] },
+  ];
+  const groups = groupExercisesForPicker(exercises, completedWorkouts);
+  // Volgorde van groepen volgt MUSCLE_GROUPS (Chest vóór Biceps vóór Legs), niet de invoervolgorde.
+  assert.deepEqual(groups.map((g) => g.muscleGroup), ["Chest", "Biceps", "Legs"]);
+  // Binnen Legs: Lunge (2x gebruikt) vóór Squat (1x gebruikt).
+  assert.deepEqual(groups.find((g) => g.muscleGroup === "Legs").exercises.map((e) => e.id), ["lunge", "squat"]);
+});
+
+test("groupExercisesForPicker sorteert alfabetisch bij gelijke (of geen) gebruiksfrequentie", () => {
+  const exercises = [
+    { id: "b", name: "Biceps curl", muscleGroup: "Biceps" },
+    { id: "a", name: "Alternerende curl", muscleGroup: "Biceps" },
+  ];
+  const groups = groupExercisesForPicker(exercises, []);
+  assert.deepEqual(groups[0].exercises.map((e) => e.id), ["a", "b"]);
 });

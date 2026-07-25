@@ -4,8 +4,8 @@ import { getDb } from "../../../core/context.js";
 import { navigate } from "../../../core/router.js";
 import { nowTimestamp } from "../../../core/dateUtils.js";
 import { generateId } from "../../../core/id.js";
-import { getTemplate, saveTemplate, listExercises } from "../storage.js";
-import { isCoreGroup, isValidSet } from "../model.js";
+import { getTemplate, saveTemplate, listExercises, listAllCompletedWorkouts } from "../storage.js";
+import { isCoreGroup, isValidSet, groupExercisesForPicker } from "../model.js";
 import { showToast } from "../../../core/ui/toast.js";
 import { screenHeader, parseWeightInput } from "./shared.js";
 
@@ -14,6 +14,7 @@ export default async function renderTemplateEditor(container, params) {
   const isEdit = !!params.id;
   const allExercises = (await listExercises(db)).filter((e) => e.active).sort((a, b) => a.name.localeCompare(b.name));
   const exerciseById = new Map(allExercises.map((e) => [e.id, e]));
+  const exerciseGroups = groupExercisesForPicker(allExercises, await listAllCompletedWorkouts(db));
 
   let template = null;
   let exercises = [];
@@ -105,8 +106,12 @@ export default async function renderTemplateEditor(container, params) {
 
   const addExerciseSelect = el("select", {});
   addExerciseSelect.appendChild(el("option", { value: "", text: "Kies een oefening..." }));
-  for (const ex of allExercises) {
-    addExerciseSelect.appendChild(el("option", { value: ex.id, text: `${ex.name} (${ex.muscleGroup})` }));
+  for (const group of exerciseGroups) {
+    const optgroup = el("optgroup", { label: group.muscleGroup });
+    for (const ex of group.exercises) {
+      optgroup.appendChild(el("option", { value: ex.id, text: ex.name }));
+    }
+    addExerciseSelect.appendChild(optgroup);
   }
   container.appendChild(el("label", { text: "Oefening toevoegen" }));
   container.appendChild(addExerciseSelect);
