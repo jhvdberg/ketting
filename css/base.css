@@ -308,6 +308,7 @@ input:focus, textarea:focus, select:focus {
   border: 1px solid var(--amber);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
+  margin-top: max(12px, env(safe-area-inset-top));
   margin-bottom: 12px;
   display: flex;
   align-items: center;

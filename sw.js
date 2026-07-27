@@ -4,7 +4,7 @@
  * handmatig gesynchroniseerd met src/core/version.js bij elke release die
  * bestanden toevoegt of wijzigt.
  */
-const CACHE_VERSION = "ketting-v2.2.7";
+const CACHE_VERSION = "ketting-v2.2.8";
 const ASSETS = [
   "./",
   "./index.html",
