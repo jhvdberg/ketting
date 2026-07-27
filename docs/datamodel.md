@@ -82,7 +82,7 @@ Historische weekschema-versies, zelfde patroon als Habits.
 
 ## Lezen (`src/modules/reading/storage.js`)
 
-Deze module staat niet in de oorspronkelijke briefing; zie [implementatiekeuzes.md](implementatiekeuzes.md). De bibliotheek wordt volledig door de gebruiker zelf gevuld via een JSON-import (`#/lezen/bibliotheek`) — de app bevat geen voorgeladen teksten.
+Deze module staat niet in de oorspronkelijke briefing; zie [implementatiekeuzes.md](implementatiekeuzes.md). De bibliotheek wordt bij de eerste opstart automatisch gevuld vanuit het meegeleverde `src/modules/reading/seed-texts.json` (zolang de bibliotheek leeg is); via `#/lezen/bibliotheek` kan je later zelf meer teksten toevoegen met een JSON-import.
 
 ### `readingTexts` (keyPath `id`)
 `{ id, order, tradition, school, author, source, translator, editionYear, reference, title, text, quote, primaryTheme, themes: string[], wordCount, lastShownDate: "YYYY-MM-DD"|null, timesShown, addedAt }` — alleen `source` en `text` zijn verplicht bij import, de rest is optionele metadata die getoond wordt als aanwezig. `order` bewaart de importvolgorde (voor de eerste ronde vóór er rotatiehistorie is); `lastShownDate`/`timesShown` sturen de rotatie (zie hieronder) en worden nooit door een latere import overschreven van bestaande teksten.

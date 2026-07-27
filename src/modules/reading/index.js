@@ -5,7 +5,7 @@
 
 import { el } from "../../core/ui/dom.js";
 import { isValidISODate, startOfWeek } from "../../core/dateUtils.js";
-import { STORE_DEFS, listTexts, listLog, exportAll, replaceAll } from "./storage.js";
+import { STORE_DEFS, listTexts, listLog, exportAll, replaceAll, seedFromBundledFileIfEmpty } from "./storage.js";
 import { READING_SCHEMA_VERSION, migrateReadingData, emptyReadingData } from "./migrations.js";
 import { weekReadCount } from "./model.js";
 
@@ -51,9 +51,12 @@ export const readingModule = {
   available: true,
   stores: STORE_DEFS,
 
-  async init(_db) {
-    // Geen datumgedreven boekhouding nodig: de tekst van vandaag wordt pas
-    // gekozen en vastgelegd zodra het scherm daadwerkelijk geopend wordt.
+  async init(db) {
+    // Vult een lege bibliotheek automatisch met het meegeleverde
+    // startbestand (seed-texts.json) — geen handmatige import nodig.
+    // Verder geen datumgedreven boekhouding: de tekst van vandaag wordt
+    // pas gekozen en vastgelegd zodra het scherm daadwerkelijk geopend wordt.
+    await seedFromBundledFileIfEmpty(db);
   },
 
   async exportData(db) {

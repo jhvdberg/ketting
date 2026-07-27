@@ -6,7 +6,8 @@
 import { getAll, get, put, putAll, bulkReplace } from "../../core/db.js";
 import { generateId } from "../../core/id.js";
 import { nowTimestamp } from "../../core/dateUtils.js";
-import { textDedupeKey } from "./model.js";
+import { textDedupeKey, extractImportTexts, isValidImportEntry } from "./model.js";
+import { logError } from "../../core/errors.js";
 
 export const STORE_DEFS = [
   { name: "readingTexts", keyPath: "id" },
@@ -72,6 +73,29 @@ export async function importTexts(db, entries) {
   }
   if (toAdd.length > 0) await putAll(db, "readingTexts", toAdd);
   return { added: toAdd.length, skipped };
+}
+
+/**
+ * Vult een lege bibliotheek automatisch met het meegeleverde startbestand
+ * (`seed-texts.json`, naast dit bestand). Doet niets zodra er al teksten
+ * zijn — dit is dus geen doorlopende sync, alleen een eenmalige vulling bij
+ * de eerste keer opstarten (of na "alles verwijderen"). Een netwerk-/
+ * parsefout mag het opstarten van de app nooit blokkeren, dus die wordt
+ * hier zelf afgevangen in plaats van doorgegooid.
+ */
+export async function seedFromBundledFileIfEmpty(db) {
+  const existing = await listTexts(db);
+  if (existing.length > 0) return { added: 0, skipped: 0 };
+  try {
+    const res = await fetch(new URL("./seed-texts.json", import.meta.url));
+    if (!res.ok) return { added: 0, skipped: 0 };
+    const json = await res.json();
+    const entries = extractImportTexts(json) || [];
+    return await importTexts(db, entries.filter(isValidImportEntry));
+  } catch (err) {
+    logError("reading-seed", err);
+    return { added: 0, skipped: 0 };
+  }
 }
 
 export async function exportAll(db) {
