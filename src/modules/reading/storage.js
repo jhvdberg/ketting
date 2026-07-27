@@ -12,12 +12,25 @@ import { logError } from "../../core/errors.js";
 export const STORE_DEFS = [
   { name: "readingTexts", keyPath: "id" },
   { name: "readingLog", keyPath: "date" },
+  { name: "readingSettings", keyPath: "id" },
 ];
+
+const FILTERS_RECORD_ID = "filters";
 
 export const listTexts = (db) => getAll(db, "readingTexts");
 export const getText = (db, id) => get(db, "readingTexts", id);
 export const listLog = (db) => getAll(db, "readingLog");
 export const getLogEntry = (db, date) => get(db, "readingLog", date);
+
+/** Geselecteerde tradities voor de rotatie; lege lijst betekent "alles" (geen filter). */
+export async function getSelectedTraditions(db) {
+  const record = await get(db, "readingSettings", FILTERS_RECORD_ID);
+  return record ? record.traditions : [];
+}
+
+export function setSelectedTraditions(db, traditions) {
+  return put(db, "readingSettings", { id: FILTERS_RECORD_ID, traditions });
+}
 
 /** Wijst een tekst toe aan vandaag: logt de datum en werkt de rotatiestatus van de tekst bij. */
 export async function markShownToday(db, textId, date) {
@@ -99,10 +112,14 @@ export async function seedFromBundledFileIfEmpty(db) {
 }
 
 export async function exportAll(db) {
-  const [texts, log] = await Promise.all([listTexts(db), listLog(db)]);
-  return { texts, log };
+  const [texts, log, traditions] = await Promise.all([listTexts(db), listLog(db), getSelectedTraditions(db)]);
+  return { texts, log, traditions };
 }
 
 export function replaceAll(db, data) {
-  return bulkReplace(db, { readingTexts: data.texts, readingLog: data.log });
+  return bulkReplace(db, {
+    readingTexts: data.texts,
+    readingLog: data.log,
+    readingSettings: data.traditions && data.traditions.length ? [{ id: FILTERS_RECORD_ID, traditions: data.traditions }] : [],
+  });
 }

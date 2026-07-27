@@ -12,9 +12,10 @@ import { weekReadCount } from "./model.js";
 function importValidate(data) {
   const errors = [];
   if (!data || typeof data !== "object") return { valid: false, errors: ["Lezen-data ontbreekt of is ongeldig."] };
-  const { texts, log } = data;
+  const { texts, log, traditions } = data;
   if (!Array.isArray(texts)) errors.push("'texts' moet een lijst zijn.");
   if (!Array.isArray(log)) errors.push("'log' moet een lijst zijn.");
+  if (traditions !== undefined && !Array.isArray(traditions)) errors.push("'traditions' moet een lijst zijn.");
   if (errors.length) return { valid: false, errors };
 
   const textIds = new Set();
@@ -68,7 +69,11 @@ export const readingModule = {
   migrateExportData: (data, fromVersion, toVersion) => migrateReadingData(data, fromVersion, toVersion),
 
   prepareImportRecords(data) {
-    return { readingTexts: data.texts, readingLog: data.log };
+    return {
+      readingTexts: data.texts,
+      readingLog: data.log,
+      readingSettings: data.traditions && data.traditions.length ? [{ id: "filters", traditions: data.traditions }] : [],
+    };
   },
 
   async migrateLiveData(db, fromVersion, toVersion) {

@@ -6,6 +6,8 @@ import {
   isValidImportEntry,
   textDedupeKey,
   weekReadCount,
+  filterTextsByTraditions,
+  listTraditionsWithCounts,
 } from "../../../src/modules/reading/model.js";
 
 test("selectTodaysText kiest bij een verse bibliotheek de laagste importvolgorde (order)", () => {
@@ -63,4 +65,35 @@ test("textDedupeKey herkent dezelfde bron+referentie als duplicaat, ongeacht ove
 test("weekReadCount telt alleen logdatums binnen de opgegeven week tot en met vandaag", () => {
   const logDates = ["2026-01-01", "2026-01-02", "2026-01-06", "2025-12-31"];
   assert.equal(weekReadCount(logDates, "2026-01-01", "2026-01-02"), 2);
+});
+
+test("filterTextsByTraditions: lege of ontbrekende selectie betekent alles, niet niets", () => {
+  const texts = [
+    { id: "a", tradition: "Stoicism" },
+    { id: "b", tradition: "Christian scripture" },
+  ];
+  assert.deepEqual(filterTextsByTraditions(texts, []), texts);
+  assert.deepEqual(filterTextsByTraditions(texts, null), texts);
+  assert.deepEqual(filterTextsByTraditions(texts, undefined), texts);
+});
+
+test("filterTextsByTraditions beperkt tot de gekozen tradities", () => {
+  const texts = [
+    { id: "a", tradition: "Stoicism" },
+    { id: "b", tradition: "Christian scripture" },
+    { id: "c", tradition: "Confucian philosophy" },
+  ];
+  assert.deepEqual(filterTextsByTraditions(texts, ["Stoicism", "Confucian philosophy"]).map((t) => t.id), ["a", "c"]);
+});
+
+test("listTraditionsWithCounts telt per traditie en sorteert alfabetisch", () => {
+  const texts = [
+    { tradition: "Stoicism" },
+    { tradition: "Christian scripture" },
+    { tradition: "Stoicism" },
+  ];
+  assert.deepEqual(listTraditionsWithCounts(texts), [
+    { tradition: "Christian scripture", count: 1 },
+    { tradition: "Stoicism", count: 2 },
+  ]);
 });

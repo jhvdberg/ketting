@@ -11,7 +11,7 @@ const MIGRATIONS = {
 };
 
 export function emptyReadingData() {
-  return { texts: [], log: [] };
+  return { texts: [], log: [], traditions: [] };
 }
 
 export function migrateReadingData(data, fromVersion, toVersion = READING_SCHEMA_VERSION) {

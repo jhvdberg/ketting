@@ -90,7 +90,12 @@ Deze module staat niet in de oorspronkelijke briefing; zie [implementatiekeuzes.
 ### `readingLog` (keyPath `date`)
 Hoogstens één record per datum. `{ date: "YYYY-MM-DD", textId }` — legt vast welke tekst op welke dag getoond is, zodat herhaald openen dezelfde dag dezelfde tekst laat zien.
 
-**Rotatielogica** (`selectTodaysText()` in `model.js`): geen wachtrij die opraakt. Bij het openen van `#/lezen` zonder log-record voor vandaag wordt de tekst gekozen die het langst geleden (of nog nooit) getoond is; bij gelijke stand wint de laagste `order`. Zodra de hele bibliotheek ooit getoond is, rouleert het gewoon door vanaf de langst-niet-getoonde — geen harde stop, geen lege staat. De keuze gebeurt bewust pas op het modulescherm zelf (niet als bijwerking van het renderen van Home), zodat Home puur lezend blijft.
+### `readingSettings` (keyPath `id`)
+Eén vast record (`id: "filters"`): `{ id: "filters", traditions: string[] }`. `traditions` is de lijst tradities die in de dagelijkse rotatie mogen meedoen; een lege lijst (of ontbrekend record) betekent "geen filter, alles doet mee" — nooit "niets", en blijft zo ook automatisch kloppen zodra een latere import nieuwe tradities toevoegt.
+
+**Rotatielogica** (`selectTodaysText()` in `model.js`): geen wachtrij die opraakt. Bij het openen van `#/lezen` zonder log-record voor de bekeken dag wordt de tekst gekozen die het langst geleden (of nog nooit) getoond is binnen de op dat moment geselecteerde tradities (`filterTextsByTraditions()`); bij gelijke stand wint de laagste `order`. Zodra de gefilterde bibliotheek ooit volledig getoond is, rouleert het gewoon door vanaf de langst-niet-getoonde — geen harde stop, geen lege staat.
+
+**Dagnavigatie** (`#/lezen/:date`, `readingHome.js`): alleen *vandaag* kent het hierboven beschreven "kies en leg vast"-gedrag. Een dag in het verleden toont uitsluitend wat er destijds daadwerkelijk gelogd is (nooit met terugwerkende kracht alsnog een tekst toewijzen); ontbreekt die log, dan toont het scherm een lege staat. Precies één dag vooruit ("morgen") is toegestaan als een niet-opgeslagen voorlopige preview van wat `selectTodaysText()` op dit moment zou kiezen — verdere navigatie in de toekomst is geblokkeerd. De keuze voor vandaag gebeurt bewust pas op het modulescherm zelf (niet als bijwerking van het renderen van Home), zodat Home puur lezend blijft.
 
 ## Lokale voorkeuren (localStorage)
 

@@ -56,3 +56,25 @@ export function textDedupeKey(entry) {
 export function weekReadCount(logDates, weekStartISO, todayISO) {
   return logDates.filter((d) => compareISO(d, weekStartISO) >= 0 && compareISO(d, todayISO) <= 0).length;
 }
+
+/**
+ * Beperkt de bibliotheek tot de gekozen tradities ("bijbel", "stoïcisme",
+ * enz. — het `tradition`-veld). Een lege of ontbrekende selectie betekent
+ * "alles", niet "niets" (zo blijft de rotatie meteen werken zonder dat een
+ * gebruiker eerst iets hoeft aan te vinken).
+ */
+export function filterTextsByTraditions(texts, selectedTraditions) {
+  if (!selectedTraditions || selectedTraditions.length === 0) return texts;
+  const allowed = new Set(selectedTraditions);
+  return texts.filter((t) => allowed.has(t.tradition));
+}
+
+/** Alle tradities in de bibliotheek met aantal teksten, alfabetisch — voor de filter-UI. */
+export function listTraditionsWithCounts(texts) {
+  const counts = new Map();
+  for (const t of texts) {
+    const key = t.tradition || "Onbekend";
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return [...counts.entries()].map(([tradition, count]) => ({ tradition, count })).sort((a, b) => a.tradition.localeCompare(b.tradition));
+}
