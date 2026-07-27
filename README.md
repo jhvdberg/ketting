@@ -1,6 +1,6 @@
 # Ketting
 
-Persoonlijke, modulaire tracking-PWA voor gym, alcoholgebruik en habits. Vanilla JavaScript (ES-modules), geen buildstap, geen frameworks, geen externe runtime-dependencies. Data blijft lokaal op het toestel in IndexedDB; er is bewust geen cloud-opslag of account (zie [docs/briefing.md](docs/briefing.md)).
+Persoonlijke, modulaire tracking-PWA voor gym, alcoholgebruik, habits en dagelijkse leesteksten. Vanilla JavaScript (ES-modules), geen buildstap, geen frameworks, geen externe runtime-dependencies. Data blijft lokaal op het toestel in IndexedDB; er is bewust geen cloud-opslag of account (zie [docs/briefing.md](docs/briefing.md)).
 
 De volledige functionele specificatie staat in [docs/briefing.md](docs/briefing.md). Aanvullende documentatie:
 
@@ -26,6 +26,7 @@ src/
     gym/                       oefeningen, templates, cycli, actieve workout, classificatie, grafieken
     alcohol/                   weekschema, dagregistratie, analyse, periodevergelijkingen, impactcontent
     habits/                    habits, historische schema's, streaks
+    reading/                    roterende bibliotheek met dagelijkse leesteksten (buiten de oorspronkelijke briefing, zie implementatiekeuzes.md)
 
 tests/
   core/, modules/            unit-tests voor pure, DOM-vrije logica

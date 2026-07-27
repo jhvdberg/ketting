@@ -13,6 +13,7 @@ Twee soorten versienummers, met een bewust verschillend doel (briefing 12.1):
 | `HABITS_SCHEMA_VERSION` | `src/modules/habits/migrations.js` | Vorm van de Habits-recordvelden. |
 | `GYM_SCHEMA_VERSION` | `src/modules/gym/migrations.js` | Vorm van de Gym-recordvelden. |
 | `ALCOHOL_SCHEMA_VERSION` | `src/modules/alcohol/migrations.js` | Vorm van de Alcohol-recordvelden. |
+| `READING_SCHEMA_VERSION` | `src/modules/reading/migrations.js` | Vorm van de Lezen-recordvelden. |
 | `CLASSIFICATION_FORMULA_VERSION` | `src/modules/gym/classification.js` | Versie van de classificatieformule. Elke voltooide workout bevat deze waarde als `formulaVersion`, zodat een latere formulewijziging historische uitkomsten nooit met terugwerkende kracht verandert. |
 | `IMPACT_CONTENT_VERSION` | `src/modules/alcohol/impactContent.js` | Versie van de impactcontentregels/-teksten (los van het dataschema). |
 | `EXPORT_FORMAT_VERSION` | `src/core/version.js` | Vorm van het exportbestand zelf (envelop rond de moduledata). |
@@ -78,6 +79,18 @@ Hoogstens één record per datum (7.2). `status` en `appliedLimit` worden bij he
 ### `alcoholSchedules` (keyPath `id`)
 Historische weekschema-versies, zelfde patroon als Habits.
 `{ id, days: number[7] (Mon0-index, waarde per dag of NO_LIMIT), effectiveFrom: "YYYY-MM-DD" }`
+
+## Lezen (`src/modules/reading/storage.js`)
+
+Deze module staat niet in de oorspronkelijke briefing; zie [implementatiekeuzes.md](implementatiekeuzes.md). De bibliotheek wordt volledig door de gebruiker zelf gevuld via een JSON-import (`#/lezen/bibliotheek`) — de app bevat geen voorgeladen teksten.
+
+### `readingTexts` (keyPath `id`)
+`{ id, order, tradition, school, author, source, translator, editionYear, reference, title, text, quote, primaryTheme, themes: string[], wordCount, lastShownDate: "YYYY-MM-DD"|null, timesShown, addedAt }` — alleen `source` en `text` zijn verplicht bij import, de rest is optionele metadata die getoond wordt als aanwezig. `order` bewaart de importvolgorde (voor de eerste ronde vóór er rotatiehistorie is); `lastShownDate`/`timesShown` sturen de rotatie (zie hieronder) en worden nooit door een latere import overschreven van bestaande teksten.
+
+### `readingLog` (keyPath `date`)
+Hoogstens één record per datum. `{ date: "YYYY-MM-DD", textId }` — legt vast welke tekst op welke dag getoond is, zodat herhaald openen dezelfde dag dezelfde tekst laat zien.
+
+**Rotatielogica** (`selectTodaysText()` in `model.js`): geen wachtrij die opraakt. Bij het openen van `#/lezen` zonder log-record voor vandaag wordt de tekst gekozen die het langst geleden (of nog nooit) getoond is; bij gelijke stand wint de laagste `order`. Zodra de hele bibliotheek ooit getoond is, rouleert het gewoon door vanaf de langst-niet-getoonde — geen harde stop, geen lege staat. De keuze gebeurt bewust pas op het modulescherm zelf (niet als bijwerking van het renderen van Home), zodat Home puur lezend blijft.
 
 ## Lokale voorkeuren (localStorage)
 

@@ -4,7 +4,7 @@ Zie ook [datamodel.md](datamodel.md) voor wat elke versieconstante precies betek
 
 ## Twee plekken waar dezelfde migratiestap wordt hergebruikt
 
-Elke module (`habits`, `gym`, `alcohol`) heeft een `migrations.js` met:
+Elke module (`habits`, `gym`, `alcohol`, `reading`) heeft een `migrations.js` met:
 
 - een `MODULE_SCHEMA_VERSION`-constante;
 - een `MIGRATIONS`-object: sleutel = bronversie, waarde = een pure functie die van die versie naar `versie + 1` migreert;

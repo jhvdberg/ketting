@@ -19,6 +19,8 @@ import { alcoholModule } from "./modules/alcohol/index.js";
 import { registerAlcoholRoutes } from "./modules/alcohol/routes.js";
 import { habitsModule } from "./modules/habits/index.js";
 import { registerHabitsRoutes } from "./modules/habits/routes.js";
+import { readingModule } from "./modules/reading/index.js";
+import { registerReadingRoutes } from "./modules/reading/routes.js";
 import renderHome from "./screens/home.js";
 import renderSettings from "./screens/settings.js";
 import renderNotFound from "./screens/notFound.js";
@@ -26,6 +28,7 @@ import renderNotFound from "./screens/notFound.js";
 registerModule(gymModule);
 registerModule(alcoholModule);
 registerModule(habitsModule);
+registerModule(readingModule);
 
 async function migrateModules(db) {
   // Migraties draaien altijd voor alle gebouwde modules, ook uitgezette:
@@ -107,6 +110,7 @@ async function boot() {
     if (isModuleEnabled(gymModule.id)) registerGymRoutes();
     if (isModuleEnabled(alcoholModule.id)) registerAlcoholRoutes();
     if (isModuleEnabled(habitsModule.id)) registerHabitsRoutes();
+    if (isModuleEnabled(readingModule.id)) registerReadingRoutes();
     registerNotFound(renderNotFound);
 
     await initRouter(document.getElementById("app"));

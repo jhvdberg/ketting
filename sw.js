@@ -4,7 +4,7 @@
  * handmatig gesynchroniseerd met src/core/version.js bij elke release die
  * bestanden toevoegt of wijzigt.
  */
-const CACHE_VERSION = "ketting-v2.3.0";
+const CACHE_VERSION = "ketting-v2.4.0";
 const ASSETS = [
   "./",
   "./index.html",
@@ -87,6 +87,13 @@ const ASSETS = [
   "./src/modules/alcohol/screens/periodComparisons.js",
   "./src/modules/alcohol/screens/wildcardOverview.js",
   "./src/modules/alcohol/screens/impactView.js",
+  "./src/modules/reading/index.js",
+  "./src/modules/reading/routes.js",
+  "./src/modules/reading/storage.js",
+  "./src/modules/reading/model.js",
+  "./src/modules/reading/migrations.js",
+  "./src/modules/reading/screens/readingHome.js",
+  "./src/modules/reading/screens/library.js",
 ];
 
 self.addEventListener("install", (event) => {

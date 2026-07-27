@@ -32,3 +32,16 @@ Beide punten waren niet in de briefing voorzien; ze zijn toegevoegd nadat een ec
 ## Alcohol: "geen maximum" per dag
 
 Niet in de oorspronkelijke briefing; toegevoegd op uitdrukkelijk verzoek van de gebruiker tijdens fase 2. Een weekschemadag kan naast een numerieke limiet ook "geen maximum" zijn (sentinelwaarde `NO_LIMIT = -1`, los van `null` dat "nog geen schema" betekent). Zo'n dag telt — net als een wildcard — niet mee in het nalevingspercentage of de beoordeelde-gebruik/limiet-statistieken, wel in het totaal aantal glazen. Geldt alleen voor het weekschema, niet als losse markering per dag.
+
+## Functies aan/uit (module enable/disable)
+
+Niet in de oorspronkelijke briefing; toegevoegd op verzoek van de gebruiker na fase 3. Een nieuwe "Functies"-sectie in Instellingen laat je elke module afzonderlijk uitzetten. De voorkeur staat in `localStorage`, niet IndexedDB (een toestelinstelling, geen gebruikersdata) — zie [datamodel.md](datamodel.md). Uitzetten verbergt een module alleen (Home + routes); schemamigraties en module-`init()` blijven voor elke module doorlopen, ook uitgezette, zodat data nooit veroudert of verloren gaat.
+
+## Lezen: een volledig nieuwe module buiten de briefing
+
+De hele Lezen-module (roterende bibliotheek met dagelijkse leesteksten uit boeken/geschriften) staat niet in `docs/briefing.md` — dit is de enige toevoeging in het project die een volledig nieuwe module betreft in plaats van een aanpassing binnen een bestaande. Gebouwd op uitdrukkelijk verzoek van de gebruiker, volgens exact dezelfde architectuur als Gym/Alcohol/Habits (moduleregister-descriptor, dunne `storage.js`, pure domeinlogica, Home-integratie). Kernkeuzes:
+
+- **Geen voorgeladen content.** De app bevat zelf geen teksten; de gebruiker bouwt zijn eigen bibliotheek op via een JSON-import (`#/lezen/bibliotheek`). Dit vermijdt auteursrechtelijke risico's en houdt de app volledig offline/zonder externe bronnen, consistent met de rest van de app.
+- **Roulatie in plaats van een eindige wachtrij.** `selectTodaysText()` kiest altijd de tekst die het langst geleden (of nooit) getoond is; zodra de hele bibliotheek ooit getoond is begint het vanzelf opnieuw bij de langst-niet-getoonde. Geen harde stop, geen lege staat, werkt met elke bibliotheekgrootte.
+- **De tekst van vandaag wordt pas gekozen en vastgelegd bij het openen van het modulescherm zelf**, niet als bijwerking van het renderen van Home — Home blijft zo puur lezend, zoals bij de andere modules.
+- **Importformaat accepteert zowel een kale array als `{ texts: [...] }`**, en vereist alleen `source` en `text` per entry; overige velden (traditie, auteur, vertaler, jaartal, referentie, quote, thema's, woordaantal) zijn optionele metadata die getoond wordt als aanwezig. Duplicaten (zelfde bron+referentie) worden bij een herhaalde import automatisch overgeslagen.
