@@ -22,7 +22,7 @@ export default async function renderHome(container) {
 
   const modules = getModules();
   if (modules.length === 0) {
-    container.appendChild(el("p", { class: "empty-state", text: "Nog geen modules beschikbaar." }));
+    container.appendChild(el("p", { class: "empty-state", text: "Geen modules ingeschakeld. Zet er een aan in Instellingen." }));
     return;
   }
 

@@ -79,6 +79,14 @@ Hoogstens één record per datum (7.2). `status` en `appliedLimit` worden bij he
 Historische weekschema-versies, zelfde patroon als Habits.
 `{ id, days: number[7] (Mon0-index, waarde per dag of NO_LIMIT), effectiveFrom: "YYYY-MM-DD" }`
 
+## Lokale voorkeuren (localStorage)
+
+Naast IndexedDB (data) gebruikt de app `localStorage` voor kleine interfacevoorkeuren die geen onderdeel zijn van een back-up:
+
+| Key | Bestand | Betekenis |
+|---|---|---|
+| `ketting-disabled-modules` | `src/core/modulePrefs.js` | JSON-array met id's van modules die de gebruiker in Instellingen heeft uitgezet. Beïnvloedt alleen zichtbaarheid/navigatie (`getModules()` in `moduleRegistry.js`) — raakt nooit IndexedDB-data, migraties of module-`init()` aan (die blijven altijd voor alle modules draaien, zie [migraties.md](migraties.md)). Ontbreekt de key, dan zijn alle modules aan (standaardgedrag, geen migratie nodig voor bestaande gebruikers). Zit bewust niet in export/import: het is een toestelinstelling, geen gebruikersdata.
+
 ## Export/importformaat
 
 Zie `src/core/exportImport.js`. Eén JSON-bestand:

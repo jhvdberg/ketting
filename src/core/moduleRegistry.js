@@ -7,6 +7,8 @@
  * dat de core-logica wordt aangepast (briefing 19.1).
  */
 
+import { isModuleEnabled } from "./modulePrefs.js";
+
 const modules = [];
 
 /**
@@ -35,7 +37,18 @@ export function registerModule(mod) {
   modules.sort((a, b) => a.order - b.order);
 }
 
+/** Modules die nu getoond/genavigeerd mogen worden: gebouwd én door de gebruiker aangezet. */
 export function getModules() {
+  return modules.filter((m) => m.available !== false && isModuleEnabled(m.id));
+}
+
+/**
+ * Alle gebouwde modules, ongeacht de aan/uit-voorkeur van de gebruiker.
+ * Gebruikt voor dingen die altijd moeten doorlopen los van die voorkeur:
+ * schemamigraties, module-init, de store-definities voor de database, en
+ * de instellingenlijst waar je een module juist weer aanzet.
+ */
+export function getAllModules() {
   return modules.filter((m) => m.available !== false);
 }
 

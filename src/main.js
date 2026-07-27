@@ -4,7 +4,8 @@
  */
 import { openDatabase } from "./core/db.js";
 import { DB_NAME, DB_VERSION } from "./core/version.js";
-import { registerModule, getModules, getAllStoreDefs } from "./core/moduleRegistry.js";
+import { registerModule, getAllModules, getAllStoreDefs } from "./core/moduleRegistry.js";
+import { isModuleEnabled } from "./core/modulePrefs.js";
 import { setDb } from "./core/context.js";
 import { registerRoute, registerNotFound, initRouter } from "./core/router.js";
 import { initServiceWorker } from "./core/swManager.js";
@@ -27,9 +28,12 @@ registerModule(alcoholModule);
 registerModule(habitsModule);
 
 async function migrateModules(db) {
+  // Migraties draaien altijd voor alle gebouwde modules, ook uitgezette:
+  // een module die je later weer aanzet mag nooit een verouderd schema
+  // hebben omdat migraties oversloegen terwijl hij uitstond.
   const state = await loadSchemaState(db);
   let changed = false;
-  for (const mod of getModules()) {
+  for (const mod of getAllModules()) {
     const installed = state[mod.id];
     if (installed == null) {
       state[mod.id] = mod.schemaVersion;
@@ -87,15 +91,22 @@ async function boot() {
     const db = await openDatabase({ name: DB_NAME, version: DB_VERSION, stores });
     setDb(db);
     await migrateModules(db);
-    for (const mod of getModules()) {
+    // init() draait ook voor uitgezette modules: bv. Gym's cyclusreconciliatie
+    // moet blijven bijhouden wat er (zou zijn) gebeurd, ook als de module nu
+    // even niet zichtbaar is, anders klopt de historie niet meer zodra hij
+    // weer aangezet wordt.
+    for (const mod of getAllModules()) {
       await mod.init(db);
     }
 
     registerRoute("/", renderHome);
     registerRoute("/settings", renderSettings);
-    registerGymRoutes();
-    registerAlcoholRoutes();
-    registerHabitsRoutes();
+    // Routes van een uitgezette module worden bewust niet geregistreerd: zo
+    // valt directe navigatie ernaartoe (bv. een oude bladwijzer) netjes terug
+    // op de bestaande "niet gevonden"-pagina in plaats van de module te tonen.
+    if (isModuleEnabled(gymModule.id)) registerGymRoutes();
+    if (isModuleEnabled(alcoholModule.id)) registerAlcoholRoutes();
+    if (isModuleEnabled(habitsModule.id)) registerHabitsRoutes();
     registerNotFound(renderNotFound);
 
     await initRouter(document.getElementById("app"));

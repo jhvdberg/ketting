@@ -1,7 +1,8 @@
 /** Instellingen (briefing 9, 10, 11). */
 import { el, clearNode } from "../core/ui/dom.js";
 import { getDb } from "../core/context.js";
-import { getModules, getAllStoreDefs } from "../core/moduleRegistry.js";
+import { getAllModules, getAllStoreDefs } from "../core/moduleRegistry.js";
+import { isModuleEnabled, setModuleEnabled } from "../core/modulePrefs.js";
 import { buildExport, exportFileName, parseImportFile, validateImportShape, applyImport } from "../core/exportImport.js";
 import { APP_VERSION, CORE_SCHEMA_VERSION } from "../core/version.js";
 import { CORE_META_STORE } from "../core/schemaState.js";
@@ -29,6 +30,30 @@ export default async function renderSettings(container) {
   clearNode(container);
 
   container.appendChild(screenHeader({ title: "Instellingen", backTo: "#/" }));
+
+  // --- functies aan/uit ---
+  container.appendChild(el("h2", { class: "section", text: "Functies" }));
+  const functionRows = [
+    el("p", { class: "hint", text: "Zet functies die je niet gebruikt uit. Bestaande data blijft altijd bewaard en komt terug zodra je een module weer aanzet." }),
+  ];
+  for (const mod of getAllModules()) {
+    const enabled = isModuleEnabled(mod.id);
+    functionRows.push(
+      el("div", { class: "list-row" }, [
+        el("span", { text: `${mod.icon} ${mod.name}` }),
+        el("button", {
+          class: `btn small ${enabled ? "primary" : "ghost"}`,
+          type: "button",
+          text: enabled ? "Aan" : "Uit",
+          onClick: () => {
+            setModuleEnabled(mod.id, !enabled);
+            location.reload();
+          },
+        }),
+      ])
+    );
+  }
+  container.appendChild(el("div", { class: "card" }, functionRows));
 
   // --- back-up ---
   container.appendChild(el("h2", { class: "section", text: "Back-up" }));
@@ -105,7 +130,7 @@ export default async function renderSettings(container) {
     el("div", { class: "list-row" }, [el("span", { text: "Appversie" }), el("span", { class: "hint", text: APP_VERSION })]),
     el("div", { class: "list-row" }, [el("span", { text: "Coreschema" }), el("span", { class: "hint", text: String(CORE_SCHEMA_VERSION) })]),
   ];
-  for (const mod of getModules()) {
+  for (const mod of getAllModules()) {
     versionRows.push(el("div", { class: "list-row" }, [el("span", { text: `${mod.name}-schema` }), el("span", { class: "hint", text: String(mod.schemaVersion) })]));
   }
   container.appendChild(el("div", { class: "card" }, versionRows));
@@ -114,7 +139,7 @@ export default async function renderSettings(container) {
   container.appendChild(el("h2", { class: "section", text: "Alle lokale data verwijderen" }));
   container.appendChild(
     el("div", { class: "card" }, [
-      el("p", { class: "hint", text: `Verwijdert alle gegevens van alle modules (${getModules().map((m) => m.name).join(", ")}) definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren.` }),
+      el("p", { class: "hint", text: `Verwijdert alle gegevens van alle modules (${getAllModules().map((m) => m.name).join(", ")}), ook uitgezette, definitief van dit apparaat. Maak eerst een export als je iets wilt bewaren.` }),
       el("button", {
         class: "btn danger",
         type: "button",
