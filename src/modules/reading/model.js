@@ -78,3 +78,40 @@ export function listTraditionsWithCounts(texts) {
   }
   return [...counts.entries()].map(([tradition, count]) => ({ tradition, count })).sort((a, b) => a.tradition.localeCompare(b.tradition));
 }
+
+function shuffleArray(array, random) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/**
+ * Bepaalt een nieuwe leesvolgorde die niet zomaar willekeurig is, maar
+ * geclusterd op `primaryTheme`: eerst worden de theamclusters zelf in
+ * willekeurige volgorde gezet, en binnen elk cluster de teksten ook. Zo
+ * krijg je een paar dagen achter elkaar teksten rond hetzelfde thema (uit
+ * verschillende tradities/bronnen door elkaar) voordat het cluster wisselt
+ * — in plaats van kaal chronologisch achter elkaar dezelfde bron (bv. alle
+ * Matthew-hoofdstukken op rij) of volledig ongestructureerd door elkaar.
+ * Geeft de teksten terug in de nieuwe volgorde; de aanroeper kent op basis
+ * daarvan nieuwe `order`-waarden toe.
+ *
+ * @param {Function} random injecteerbaar voor deterministisch testen (standaard Math.random)
+ */
+export function clusterShuffleOrder(texts, random = Math.random) {
+  const byTheme = new Map();
+  for (const t of texts) {
+    const key = t.primaryTheme || "onbekend";
+    if (!byTheme.has(key)) byTheme.set(key, []);
+    byTheme.get(key).push(t);
+  }
+  const themeKeys = shuffleArray([...byTheme.keys()], random);
+  const result = [];
+  for (const key of themeKeys) {
+    result.push(...shuffleArray(byTheme.get(key), random));
+  }
+  return result;
+}

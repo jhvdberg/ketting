@@ -8,7 +8,17 @@ import {
   weekReadCount,
   filterTextsByTraditions,
   listTraditionsWithCounts,
+  clusterShuffleOrder,
 } from "../../../src/modules/reading/model.js";
+
+/** Deterministische PRNG voor reproduceerbare shuffle-tests. */
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
 
 test("selectTodaysText kiest bij een verse bibliotheek de laagste importvolgorde (order)", () => {
   const texts = [
@@ -84,6 +94,36 @@ test("filterTextsByTraditions beperkt tot de gekozen tradities", () => {
     { id: "c", tradition: "Confucian philosophy" },
   ];
   assert.deepEqual(filterTextsByTraditions(texts, ["Stoicism", "Confucian philosophy"]).map((t) => t.id), ["a", "c"]);
+});
+
+test("clusterShuffleOrder houdt teksten met hetzelfde primaryTheme aaneengesloten", () => {
+  const texts = [
+    { id: "a1", primaryTheme: "wisdom" },
+    { id: "b1", primaryTheme: "justice" },
+    { id: "a2", primaryTheme: "wisdom" },
+    { id: "c1", primaryTheme: "virtue" },
+    { id: "a3", primaryTheme: "wisdom" },
+    { id: "b2", primaryTheme: "justice" },
+  ];
+  const result = clusterShuffleOrder(texts, seededRandom(42));
+  const themeSequence = result.map((t) => t.primaryTheme);
+  // Elk thema mag maar één aaneengesloten blok vormen (nooit twee keer onderbroken).
+  const seenThemes = new Set();
+  let previousTheme = null;
+  for (const theme of themeSequence) {
+    if (theme !== previousTheme) {
+      assert.equal(seenThemes.has(theme), false, `thema '${theme}' komt niet-aaneengesloten voor: ${themeSequence.join(",")}`);
+      seenThemes.add(theme);
+      previousTheme = theme;
+    }
+  }
+});
+
+test("clusterShuffleOrder geeft precies dezelfde teksten terug, alleen herschikt", () => {
+  const texts = [{ id: "a", primaryTheme: "x" }, { id: "b", primaryTheme: "y" }, { id: "c", primaryTheme: "x" }];
+  const result = clusterShuffleOrder(texts, seededRandom(7));
+  assert.deepEqual(new Set(result.map((t) => t.id)), new Set(["a", "b", "c"]));
+  assert.equal(result.length, 3);
 });
 
 test("listTraditionsWithCounts telt per traditie en sorteert alfabetisch", () => {

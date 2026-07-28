@@ -4,7 +4,7 @@ import { getDb } from "../../../core/context.js";
 import { screenHeader } from "../../../core/ui/header.js";
 import { showToast } from "../../../core/ui/toast.js";
 import { logError } from "../../../core/errors.js";
-import { listTexts, importTexts, getSelectedTraditions, setSelectedTraditions } from "../storage.js";
+import { listTexts, importTexts, getSelectedTraditions, setSelectedTraditions, reshuffleOrder } from "../storage.js";
 import { extractImportTexts, isValidImportEntry, listTraditionsWithCounts } from "../model.js";
 
 export default async function renderLibrary(container) {
@@ -75,6 +75,23 @@ export default async function renderLibrary(container) {
   await refreshTraditions();
 
   container.appendChild(el("div", { class: "card" }, [countEl]));
+
+  container.appendChild(el("h2", { class: "section", text: "Volgorde" }));
+  container.appendChild(
+    el("div", { class: "card" }, [
+      el("p", { class: "hint", text: "Husselt de volgorde van nog niet gelezen teksten, geclusterd per thema (zodat opeenvolgende dagen enigszins thematisch aansluiten in plaats van kaal op bestandsvolgorde). Al gelezen dagen blijven ongewijzigd." }),
+      el("button", {
+        class: "btn ghost",
+        type: "button",
+        text: "Volgorde husselen",
+        onClick: async () => {
+          const count = await reshuffleOrder(db);
+          showToast(`Volgorde van ${count} tekst(en) opnieuw geclusterd`);
+        },
+      }),
+    ])
+  );
+
   container.appendChild(traditionsSection);
 
   container.appendChild(el("h2", { class: "section", text: "Importeren" }));

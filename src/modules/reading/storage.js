@@ -6,7 +6,7 @@
 import { getAll, get, put, putAll, bulkReplace } from "../../core/db.js";
 import { generateId } from "../../core/id.js";
 import { nowTimestamp } from "../../core/dateUtils.js";
-import { textDedupeKey, extractImportTexts, isValidImportEntry } from "./model.js";
+import { textDedupeKey, extractImportTexts, isValidImportEntry, clusterShuffleOrder } from "./model.js";
 import { logError } from "../../core/errors.js";
 
 export const STORE_DEFS = [
@@ -89,6 +89,19 @@ export async function importTexts(db, entries) {
 }
 
 /**
+ * Herschudt de leesvolgorde van de hele bibliotheek, geclusterd op thema
+ * (zie `clusterShuffleOrder` in model.js). Raakt nooit `lastShownDate` aan:
+ * dit verandert alleen de gelijke-stand-volgorde voor nog niet (of het
+ * langst geleden) getoonde teksten, nooit de al opgebouwde geschiedenis.
+ */
+export async function reshuffleOrder(db) {
+  const texts = await listTexts(db);
+  const shuffled = clusterShuffleOrder(texts);
+  await putAll(db, "readingTexts", shuffled.map((t, i) => ({ ...t, order: i })));
+  return shuffled.length;
+}
+
+/**
  * Vult een lege bibliotheek automatisch met het meegeleverde startbestand
  * (`seed-texts.json`, naast dit bestand). Doet niets zodra er al teksten
  * zijn — dit is dus geen doorlopende sync, alleen een eenmalige vulling bij
@@ -104,7 +117,9 @@ export async function seedFromBundledFileIfEmpty(db) {
     if (!res.ok) return { added: 0, skipped: 0 };
     const json = await res.json();
     const entries = extractImportTexts(json) || [];
-    return await importTexts(db, entries.filter(isValidImportEntry));
+    const result = await importTexts(db, entries.filter(isValidImportEntry));
+    if (result.added > 0) await reshuffleOrder(db); // thematisch geclusterd i.p.v. kaal bestandsvolgorde (bv. alle Matthew-hoofdstukken op rij)
+    return result;
   } catch (err) {
     logError("reading-seed", err);
     return { added: 0, skipped: 0 };
